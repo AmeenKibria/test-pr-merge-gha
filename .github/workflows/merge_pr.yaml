@@ -63,4 +63,5 @@ merge-pr:
               console.log(`Error during merge operation: ${error.message}`);
               core.setFailed(`Failed to merge PR: ${error.message}`);
             }
+
       
