@@ -13,8 +13,7 @@ permissions:
 jobs:
   merge-pr:
       name: "Merge Pull Request"
-      runs-on: self-hosted
-      # Removed the dependency on non-existent pr_approval job
+      runs-on: ubuntu-latest
       if: github.event_name == 'pull_request'
 
       steps:
