@@ -34,7 +34,6 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const core = require('@actions/core');
           try {
             await github.rest.pulls.merge({
               pull_number: context.payload.pull_request.number,
