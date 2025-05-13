@@ -32,34 +32,34 @@ jobs:
     - name: Merge Pull Request
       uses: actions/github-script@v7.0.0
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          try {
-            await github.rest.pulls.merge({
-              pull_number: context.payload.pull_request.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              merge_method: 'merge',
-              commit_title: `Merge pull request #${context.payload.pull_request.number}: Deploy to UAT successful`,
-              commit_message: 'Automatically merged by GitHub Actions after successful UAT deployment'
+      github-token: ${{ secrets.PAT_TOKEN }}
+      script: |
+      try {
+      await github.rest.pulls.merge({
+            pull_number: context.payload.pull_request.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            merge_method: 'merge',
+            commit_title: `Merge pull request #${context.payload.pull_request.number}: Deploy to UAT successful`,
+            commit_message: 'Automatically merged by GitHub Actions after successful UAT deployment'
+      });
+
+      const pr = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.payload.pull_request.number
+      });
+      if (!pr.data.head.repo.fork) {
+            const branchName = pr.data.head.ref;
+            await github.rest.git.deleteRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `heads/${branchName}`
             });
-            
-            // Delete the feature branch after successful merge (if not from a fork)
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
+      }
+      } catch (error) {
+      console.log(`Error during merge operation: ${error.message}`);
+      core.setFailed(`Failed to merge PR: ${error.message}`);
+      }
             });
-            if (!pr.data.head.repo.fork) {
-              const branchName = pr.data.head.ref;
-              await github.rest.git.deleteRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `heads/${branchName}`
-              });
-            }
-          } catch (error) {
-            console.log(`Error during merge operation: ${error.message}`);
-            core.setFailed(`Failed to merge PR: ${error.message}`);
-          }
     
