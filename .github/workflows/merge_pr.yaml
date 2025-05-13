@@ -14,8 +14,8 @@ jobs:
   merge-pr:
       name: "Merge Pull Request"
       runs-on: self-hosted
-      needs: pr_approval
-      if: success() && github.event_name == 'pull_request'
+      # Removed the dependency on non-existent pr_approval job
+      if: github.event_name == 'pull_request'
 
       steps:
         - name: Add PR Comment
@@ -33,7 +33,7 @@ jobs:
         - name: Merge Pull Request
           uses: actions/github-script@v7.0.0
           with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
+            github-token: ${{ secrets.PAT_TOKEN }}
             script: |
               const core = require('@actions/core');
               try {
